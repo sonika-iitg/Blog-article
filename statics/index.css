@@ -1,0 +1,105 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+.form-group{
+    display: flex;
+    justify-content: center;
+    max-width: 80%;
+    height: 50%;
+    margin: auto;
+    /* border: 2px solid red; */
+    margin-top: 4px;
+    padding: 10px;
+}
+
+input{
+    width: 60%;
+}
+
+textarea{
+    width: 60%;
+    height: 30%;
+}
+
+.a_btn{
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    display: inline-block;
+    margin: 10px;
+    padding: 5px;
+    background-color: rgb(77, 197, 77);
+    border: 2px solid rgb(5, 5, 5);
+    border-radius: 5px;
+    color: white;
+}
+
+.grp{
+    display: flex;
+    flex-direction: row;
+   
+    max-width: 50%;
+    flex-wrap: wrap;
+    /* border: 2px solid red; */
+    margin : 2px auto;
+}
+
+.blogs{
+    display: flex;
+    flex-direction: column;
+    margin: 2rem;
+    /* border: 2px solid black; */
+}
+
+.blog{
+    border: 1px solid grey;
+    margin: 12px;
+    padding: 16px;
+    border-radius: 19px;
+}
+/* utility class */
+
+.mgh{
+
+    margin : 2px 2px ;
+    text-align: center;
+    
+}
+
+.mg-2{
+    margin: 2px auto;
+}
+
+.centre{
+    text-align: center;
+}
+
+.maxhw
+{
+    max-width: 80%;
+    margin: auto;
+}
+
+.heading1{
+    font-size: 28px;
+}
+
+.justified{
+    text-align: justify;
+}
+
+.btn{
+    cursor: pointer;
+    background-color: rgb(77, 197, 77);
+    border: 2px solid rgb(5, 5, 5);
+    border-radius: 5px;
+    color: white;
+    padding: 5px;   
+    margin: 10px;
+}
+
+
+
+
