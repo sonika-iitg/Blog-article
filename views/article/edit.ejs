@@ -12,10 +12,9 @@
 
 <body>
     <h1 class="mgh">Edit Article</h1>
-
-
-
-    <form action="/article/<%= article.id%>?_method=PUT" , method="POST">
+    <!-- <form action="/article/<%= article.id %>?_method=PUT" method="POST"> -->
+    <form action="/article/change?_method=PUT" method="POST">
+    <!-- <form action="/article/change" , method="POST"> -->
         <div class="form-group">
             <label for="title">TiTle</label>
             <input required , type="text" , name="title" , id="title" , value="<%= article.title   %>">
@@ -28,9 +27,9 @@
 
         <div class="form-group">
             <label for="markdown">Markdown</label>
-            <textarea required ,  name="markdown" id="markdown" rows="10"><%= article.markdown   %></textarea>
+            <textarea required ,  name="markdown" id="markdown" rows="10"><%= article.markdown %></textarea>
         </div>
-
+       
         <div class="grp">
             <div class="abtn">
                 <a href="/" class="a_btn">Cancle</a>

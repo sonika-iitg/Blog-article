@@ -28,6 +28,11 @@ const articalSchema = new mongoose.Schema({
         unique : true
 
     } , 
+    userName :{
+       type : String,
+       required : true,
+       
+    },
 
     sanitizedHtml :{
          type : String ,

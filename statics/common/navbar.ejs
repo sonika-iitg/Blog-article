@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">iBlog</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -19,9 +20,24 @@
         <li class="nav-item">
           <a class="nav-link" href="/reg/Contact">Contact Us</a>
         </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="/reg/login">Login</a>
-        </li>
+        <% if(userName!== undefined ){ %>
+         
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><%= userName%></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="/reg/LogOut">LogOut</a>
+              <!-- <a class="nav-link" href="/reg/login"><%= userName%></a> -->
+            </li>
+          
+        <% }else{ %>
+          <li class="nav-item active">
+            <a class="nav-link" href="/reg/login">Login</a>
+            <!-- <a class="nav-link" href="/reg/login"><%= userName%></a> -->
+          </li>
+          
+        <% } %>
+              
       </ul>
       <!-- <li class="nav-item">
         <a class="nav-link" href="#">Sign In</a>

@@ -1,64 +1,100 @@
 const { cache } = require('ejs');
 const express = require('express');
 const Reg = require('../models/reg');
+const user = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
+let userName = "";
 
-
-router.get('/login' , (req , res)=>{
-    res.render('reg/login.ejs' , {article : new Reg()})
+router.get('/login' , async (req , res)=>{
+   
+    res.render('reg/login.ejs' , {article : new Reg() , userName : userName })
 });
 
-router.get('/login/signUp' , (req , res)=>{
-    res.render('reg/SignUp.ejs' , {article : new Reg()})
+router.get('/logOut' , auth , async (req , res)=>{
+    res.clearCookie("jwt");
+    // console.log("logout");
+    await req.user.save();
+    res.clearCookie("userName");
+    res.redirect("/");
+    // res.render('reg/login.ejs' , {article : new Reg() , userName : userName });
 });
 
-router.get('/contact' , (req , res)=>{
-    res.render('reg/contact');
+router.get('/login/signUp' , async (req , res)=>{
+    
+    res.render('reg/SignUp.ejs' , {article : new Reg() , userName : userName})
+});
+
+router.get('/contact' , async (req , res)=>{
+    userName = req.cookies.userName;
+    res.render('reg/contact' , { userName : userName});
 });
 
 router.post('/signUp' , async (req , res)=>{
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword ;
-    console.log(password);
-    let reg = new Reg({
-        email : req.body.email,
-        userName : req.body.userName,
-        password : req.body.password
-
-    })
     
     try{
+       
         if(password === confirmPassword)
         {
+            let reg = new Reg({
+                email : req.body.email,
+                userName : req.body.userName,
+                password : req.body.password
+        
+            });
+            userName = req.body.userName;
+           
+            const token = await reg.generateAuthToken();
+             res.cookie("jwt" , token ,  {
+                 httpOnly : true,
+                //  expires : new Date(Date.now() + 5000000)
+             });
+
+             res.cookie("userName" , userName);
+
             reg = await reg.save();
+           
             res.redirect('/');
         }
         else 
         {
-            res.send("password are not same");
+            res.status(401).send("password are not same");
         }
     }
     catch(e) {
-        // console.log(reg);
-        res.send(e);
-        // res.render('reg/signUp' , {reg : reg});
+        
+        res.status(401).send(e);
     }
 })
 
 router.post('/login' , async (req , res)=>{
     const email = req.body.email;
     const password = req.body.password;
-    console.log(email);
-    console.log(password);
     try{
          
-        const user = await Reg.findOne({email : email});
-        console.log(user);
-        if(user.password === password)
+        const userData = await Reg.findOne({email : email});
+     
+        const isMatch = await bcrypt.compare(password , userData.password);
+        
+        if(isMatch)
         {
-           res.redirect('/');
-              
+            
+            const token = await userData.generateAuthToken();
+            res.cookie("jwt" , token ,  {
+                // expires : new Date(Date.now() + 5000000) ,
+                httpOnly : true,
+               
+            });
+            userName = userData.userName ;
+            res.cookie("userName" , userName);
+            res.redirect('/');
+            
         }
         else
         {
@@ -68,9 +104,11 @@ router.post('/login' , async (req , res)=>{
     }
     catch(e) {
  
-        res.send("invalid access");
+        res.status(401).send("invalid access");
     }
 })
 
 
 module.exports = router;
+
+

@@ -13,7 +13,18 @@
     
     <div class="card">
         <div class="card-header">
-            <%= article.title %>
+            <div class="row">
+                <div class="col-10">
+                    <h3>
+                        <%= article.title %>
+                    </h3>
+                </div>
+                <div class="col-2">
+                    ~by
+                    <%= article.userName %>
+                </div>
+
+            </div>
         </div>
         <div class="card-body">
           <h4 class="card-title"><%= article.discription %></h4>
