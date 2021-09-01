@@ -2,6 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const regSchema = new mongoose.Schema({
     email :{
@@ -23,7 +24,14 @@ const regSchema = new mongoose.Schema({
             type : String,
             required : true
         }
-    }]
+    }],
+    isVerified:{
+        type : Boolean
+    },
+    emailToken:{
+        type : String
+    }
+
     
   });
 
