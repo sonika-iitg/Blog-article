@@ -11,12 +11,23 @@ const slugify = require('slugify');
 const methodOverride = require('method-override');
 const user = require('./models/user');
 const cookieParser = require("cookie-parser");
+const sessiion = require('express-session');
+const flush = require('connect-flash');
+
+
 // const jwt = require("jsonwebtoken");
 
 // const {json} = require('express');
 const app = express();
 
 
+app.use(sessiion({
+  secret : 'secret',
+  cookie : {maxAge : 60000},
+  resave : false,
+  saveUninitialized : false
+}));
+app.use(flush());
 // console.log(process.env.SECRET_KEY);
 
 // const reg = Register.rou;

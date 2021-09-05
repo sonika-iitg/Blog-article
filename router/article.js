@@ -6,6 +6,10 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const auth = require("../middleware/auth");
 const { findById } = require('../models/article');
+const marked = require('marked');
+const creatDomPurify = require('dompurify');
+const {JSDOM} = require('jsdom');
+const dompurify = creatDomPurify(new JSDOM().window);
 const router = express.Router();
 
 
@@ -66,11 +70,13 @@ router.put('/change',  async (req, res) => {
 
     try {
         const id1 = req.cookies.update_id ;
+        const sanitizedHtml =  dompurify.sanitize(marked(req.body.markdown ));
         const result = await Article.updateOne({ _id: id1 }, {
             $set: {
                 title: req.body.title,
                 discription: req.body.discription,
-                markdown: req.body.markdown
+                markdown: req.body.markdown,
+                sanitizedHtml : sanitizedHtml
             }
         });
      

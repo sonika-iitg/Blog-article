@@ -1,37 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>signIn</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <title>signIn</title>
 </head>
+
 <body>
-    <%- include('../../statics/common/navbar.ejs'); -%>
+  <%- include('../../statics/common/navbar.ejs'); -%>
+  <% if(message.length>0) { %>
+    <div class="alert alert-successs">
+      <%= message %>
+    </div>
+  
+  <% } %>
     <div class="container">
-        <h1>signIn</h1>
-        <form , action="/reg/login" , method="POST">
-            <div class="row mb-3">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
-              <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputEmail3" , name="email">
-              </div>
-            </div>
-            <div class="row mb-3">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
-              <div class="col-sm-10">
-                <input type="password" class="form-control" id="inputPassword3" , name="password">
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">login</button>
-          </form>
-          <hr>
-          <div>
-              <h5 class="d-inline">Don't have account? Regester Now!</h5>
-              <a href="/reg/login/signUp" class="btn btn-primary d-inline">Sign Up</a>
+      <h1>signIn</h1>
+      <form , action="/reg/login" , method="POST">
+        <div class="row mb-3">
+          <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control" id="inputEmail3" , name="email">
           </div>
+        </div>
+        <div class="row mb-3">
+          <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" id="inputPassword3" , name="password">
+          </div>
+        </div>
+
+        <div class="d-flex flex-row bd-highlight mb-3">
+          <div class="mx-2">
+            <button type="submit" class="btn btn-primary">login</button>
+          </div>
+          <div class="mx-2">
+            <!-- <h5 class="d-inline">Don't have account? Regester Now!</h5> -->
+            <a href="/reg/forgetPassword" class="btn btn-primary ">Forget Password</a>
+          </div>
+          
+        </div>
+
+      </form>
+      <hr>
+      <div>
+        <h5 class="d-inline">Don't have account? Regester Now!</h5>
+        <a href="/reg/login/signUp" class="btn btn-primary d-inline">Sign Up</a>
+      </div>
     </div>
 </body>
+
 </html>
