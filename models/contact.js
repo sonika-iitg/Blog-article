@@ -8,32 +8,24 @@ const regSchema = new mongoose.Schema({
     email :{
         required : true,
         type : String,
-        unique : true
     },
-    userName :{
+    query :{
         type : String,
         required : true,
         // unique : true
     },
-    password :{
-        required:true,
+    // member :{
+    //     required:true,
+    //     type : String
+    // },
+    elaborate :{
+        
         type : String
     },
-    tokens :[{
-        token :{
-            type : String,
-            required : true
-        }
-    }],
-    isVerified:{
-        type : Boolean
-    },
-    emailToken:{
-        type : String
-    }
+    
 
     
   });
 
 
-  module.exports = mongoose.model('temp' , regSchema);
+  module.exports = mongoose.model('contact' , regSchema);

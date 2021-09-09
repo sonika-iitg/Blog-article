@@ -1,7 +1,7 @@
 const { cache } = require('ejs');
 const express = require('express');
 const Article = require('../models/article');
-const user = require('../models/user');
+
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const auth = require("../middleware/auth");

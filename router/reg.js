@@ -2,14 +2,14 @@ const { cache } = require('ejs');
 const express = require('express');
 const Reg = require('../models/reg');
 const temp = require('../models/user');
-const user = require('../models/user');
+const Cont = require('../models/contact');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const auth = require("../middleware/auth");
 const crypto = require("crypto");
 const nodemailer = require('nodemailer');
-const sgMail = require('@sendgrid/mail');
+
 
 const router = express.Router();
 let userName = "";
@@ -26,7 +26,7 @@ function sendMail(msg){
 
     transporter.sendMail(msg, function (error, info) {
         if (error) {
-            console.log("*");
+            // console.log("*");
             console.log(error);
             res.redirect('/');
         } else {
@@ -43,7 +43,7 @@ router.get('/login', async (req, res) => {
 
 router.get('/logOut', auth, async (req, res) => {
     res.clearCookie("jwt");
-    // console.log("logout");
+    
     await req.user.save();
     res.clearCookie("userName");
     res.redirect("/");
@@ -56,7 +56,8 @@ router.get('/login/signUp', async (req, res) => {
 
 router.get('/contact', async (req, res) => {
     userName = req.cookies.userName;
-    res.render('reg/contact', { userName: userName });
+    // let contactMessage = 
+    res.render('reg/contact', { userName: userName ,  message : req.flash('contactMessage') });
 });
 router.get('/forgetPassword', async (req, res) => {
     userName = req.cookies.userName;
@@ -66,7 +67,12 @@ router.get('/forgetPassword', async (req, res) => {
 router.post('/forgetPassword', async (req, res) => {
     const userData = await Reg.findOne({ email: req.body.email });
     if (!userData)
-        return res.status(400).send("user with given email doesn't exist");
+    {
+        req.flash('message' , 'user with given email does not exist');
+        res.redirect('/reg/login');
+        return ;
+    }
+        
     let token = userData.emailToken;
     if (!token) {
         token = crypto.randomBytes(32).toString("hex");
@@ -83,13 +89,16 @@ router.post('/forgetPassword', async (req, res) => {
         subject: 'Reset your password',
         text: `
          to reset your password , Please click on given link
-         http://${req.headers.host}/reg/forgetPassword/${userData._id}/${token}
+         <a href = "http://${req.headers.host}/reg/forgetPassword/${userData._id}/${token}"> click here </a>
+         
         `,
         html: `
         <h1> Hello , </h1>
         <p> to reset your password , Please click on given link</p>
-        " http://${req.headers.host}/reg/forgetPassword/${userData._id}/${token}"
+        <a href = "http://${req.headers.host}/reg/forgetPassword/${userData._id}/${token}"> click here </a>
+        
         `
+
     }
     sendMail(msg);
     try {
@@ -112,7 +121,16 @@ router.get('/forgetPassword/:userId/:token' , async(req , res)=>{
 router.post('/forgetPassword/:userId' , async(req , res)=>{
     userId = req.params.userId;
     const userData = await Reg.findById(req.params.userId);
-    if (!userData) return res.status(400).send("invalid link or expired");
+    if (!userData) 
+    {
+
+        req.flash('message' , 'Try again ,  invalid link or expired ');
+        res.redirect('/reg/login');
+        return ;
+        // return res.status(400).send("");
+
+    }
+    
     let newPassword = req.body.password;
     newPassword = await bcrypt.hash(newPassword , 10);
     const result = await Reg.updateOne({ _id: userData._id }, {
@@ -124,14 +142,30 @@ router.post('/forgetPassword/:userId' , async(req , res)=>{
         res.redirect("/");
     } catch (error) {
         console.log(error);
-        return res.status(400).send("invalid link or expired");
+        // return res.status(400).send("invalid link or expired");
+        req.flash('message' , 'Try again ,  invalid link or expired');
+        res.redirect('/reg/login');
+        return ; 
     }
 
 });
 
 router.post('/signUp', async (req, res) => {
-    
-    const password = await bcrypt.hash(req.body.password , 10);
+    let uniqueness = await Reg.findOne({email : req.body.email});
+    if(uniqueness)
+    {
+        // console.log(uniqueness);
+        req.flash('message' , 'Email already exist ');
+        res.redirect('/reg/login');
+        return ; 
+    }
+    uniqueness =await  temp.find({email : req.body.email});
+    if(uniqueness)
+    {
+        await temp.deleteOne({email:req.body.email});
+    }
+    // const password = await bcrypt.hash(req.body.password , 10);
+    const password = req.body.password ;
     let newUser = new temp({
         email: req.body.email,
         userName: req.body.userName,
@@ -159,16 +193,19 @@ router.post('/signUp', async (req, res) => {
         `
     }
     
-    sendMail(msg);
+    
 
     try {
 
         newUser = await newUser.save();
+        sendMail(msg);
         req.flash('message' , 'Thanks for registering . Please check your mail to verify and then login');
         res.redirect('/reg/login');
     } catch (error) {
         console.log(error);
-        res.send('error', 'Something went wrong');
+        req.flash('message' , 'Try again ,  Something went wrong');
+        res.redirect('/reg/login');
+        // res.send('error', 'Something went wrong');
     }
 
 })
@@ -177,21 +214,22 @@ router.get('/verify-email/:uniqueString', async (req, res) => {
     const { uniqueString } = req.params;
     const user = await temp.findOne({ emailToken: uniqueString });
     if (!user) {
-        res.send('error', 'Token is invalid . Please contact us for assistent');
-        return res.redirect('/');
+        req.flash('message' , 'Try again , Token is invalid ');
+        res.redirect('/reg/login');
+        // res.send('error', 'Token is invalid . Please contact us for assistent');
+        // return res.redirect('/');
+        return ; 
     }
     let newUser = new Reg({
         email: user.email,
         userName: user.userName,
         password: user.password,
         emailToken: user.emailToken,
-        isVerified: true
+        // isVerified: true
 
 
     });
-    // user.emailToken = null;
-    // user.isVerified = true;
-
+    
     userName = newUser.userName;
     const token = await newUser.generateAuthToken();
     res.cookie("jwt", token, {
@@ -202,7 +240,7 @@ router.get('/verify-email/:uniqueString', async (req, res) => {
     res.cookie("userName", userName);
 
     newUser = await newUser.save();
-
+    await temp.deleteOne({email : user.email});
     res.redirect('/');
 
 })
@@ -211,9 +249,14 @@ router.get('/verify-email/:uniqueString', async (req, res) => {
 router.post('/login', async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
+    const userData = await Reg.findOne({ email: email });
+    if(!userData)
+    {
+        req.flash('message' , 'Email does not exist ');
+        res.redirect('/reg/login');
+        return ;
+    }
     try {
-
-        const userData = await Reg.findOne({ email: email });
 
         const isMatch = await bcrypt.compare(password, userData.password);
 
@@ -221,7 +264,7 @@ router.post('/login', async (req, res) => {
 
             const token = await userData.generateAuthToken();
             res.cookie("jwt", token, {
-                // expires : new Date(Date.now() + 5000000) ,
+                
                 httpOnly: true,
 
             });
@@ -231,13 +274,39 @@ router.post('/login', async (req, res) => {
 
         }
         else {
-            res.send("Worng password");
+            req.flash('message' , 'Email does not exist or password is incorrect ');
+            res.redirect('/reg/login');
+            return ;
+            // res.send("Worng password");
         }
 
     }
     catch (e) {
+        req.flash('message' , 'invalid access');
+        res.redirect('/reg/login');
+        return ;
+        // res.status(401).send("invalid access");
+    }
+});
 
-        res.status(401).send("invalid access");
+
+router.post('/contact' , async (req , res)=>{
+    let newQuery = new Cont({
+        email : req.body.email,
+        query : req.body.query,
+        // member : req.body.member,
+        elaborate : req.body.elaborate
+    });
+
+    newQuery = await newQuery.save();
+    try {
+        req.flash('contactMessage' , 'We will contact you soon');
+        res.redirect('/reg/contact');
+        return ;
+    } catch (error) {
+        req.flash('contactMessage' , 'Something went wrong try again');
+        res.redirect('/reg/contact');
+        return ;
     }
 })
 

@@ -9,7 +9,7 @@ const regModel = require('./models/reg');
 const marked = require('marked');
 const slugify = require('slugify');
 const methodOverride = require('method-override');
-const user = require('./models/user');
+
 const cookieParser = require("cookie-parser");
 const sessiion = require('express-session');
 const flush = require('connect-flash');
